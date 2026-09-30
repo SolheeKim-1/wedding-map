@@ -182,7 +182,7 @@ export default function WeddingDetailPanel({
               <h3 className="mb-2 font-semibold text-ink">예식 정보</h3>
               <dl className="grid grid-cols-2 gap-y-3 text-sm">
                 <InfoRow label="최소 보증 인원" value={formatGuests(hall.minimumGuests)} />
-                <InfoRow label="일요일 저녁" value={formatGuests(hall.sundayEveningGuests)} />
+                <InfoRow label="토요일 점심" value={formatGuests(hall.sundayEveningGuests)} />
                 <InfoRow label="대관료" value={formatManwon(hall.rentalFee)} />
                 <InfoRow label="식대" value={formatMealPrice(hall.mealPrice)} />
                 <InfoRow label="예식 형태" value={hall.ceremonyType ?? '정보 없음'} />
