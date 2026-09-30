@@ -7,14 +7,15 @@ import LoginPage from '@/pages/Login/LoginPage'
 import WeddingRegisterPage from '@/pages/WeddingRegister/WeddingRegisterPage'
 import AdminPage from '@/pages/Admin/AdminPage'
 import ProfileSettingsPage from '@/pages/ProfileSettings/ProfileSettingsPage'
+import RequireAuth from '@/components/common/RequireAuth'
 
 export default function App() {
   return (
     <Routes>
-      <Route path="/" element={<HomePage />} />
-      <Route path="/wedding/:id" element={<HomePage />} />
-      <Route path="/search" element={<SearchPage />} />
-      <Route path="/favorites" element={<FavoritesPage />} />
+      <Route path="/" element={<RequireAuth><HomePage /></RequireAuth>} />
+      <Route path="/wedding/:id" element={<RequireAuth><HomePage /></RequireAuth>} />
+      <Route path="/search" element={<RequireAuth><SearchPage /></RequireAuth>} />
+      <Route path="/favorites" element={<RequireAuth><FavoritesPage /></RequireAuth>} />
       <Route path="/my" element={<MyPage />} />
       <Route path="/my/profile" element={<ProfileSettingsPage />} />
       <Route path="/login" element={<LoginPage />} />

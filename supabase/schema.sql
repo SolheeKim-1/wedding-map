@@ -87,10 +87,12 @@ create trigger trg_wedding_halls_updated_at
 
 alter table public.wedding_halls enable row level security;
 
+-- 웨딩홀 정보는 로그인한 사용자만 조회 가능 (앱의 RequireAuth 게이트와 짝).
 drop policy if exists "Public read access" on public.wedding_halls;
-create policy "Public read access"
+drop policy if exists "Authenticated read access" on public.wedding_halls;
+create policy "Authenticated read access"
   on public.wedding_halls for select
-  using (true);
+  using (auth.role() = 'authenticated');
 
 drop policy if exists "Public insert access" on public.wedding_halls;
 create policy "Public insert access"
