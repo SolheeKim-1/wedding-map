@@ -296,7 +296,19 @@ export default function MyPage() {
           <div className="rounded-2xl border border-line bg-white shadow-card">
             <SettingsRow icon={Bell} label="알림 설정" />
             <div className="border-t border-line" />
-            <SettingsRow icon={Shield} label="개인정보 설정" />
+            {user ? (
+              <button
+                type="button"
+                onClick={() => navigate('/my/profile')}
+                className="flex w-full items-center gap-3 px-4 py-3.5 text-left"
+              >
+                <Shield size={19} className="shrink-0 text-subtext" strokeWidth={1.75} />
+                <span className="flex-1 text-sm text-ink">개인정보 설정</span>
+                <ChevronRight size={16} className="shrink-0 text-subtext" />
+              </button>
+            ) : (
+              <SettingsRow icon={Shield} label="개인정보 설정" />
+            )}
             <div className="border-t border-line" />
             <SettingsRow icon={Headset} label="고객센터" />
           </div>

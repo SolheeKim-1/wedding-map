@@ -6,6 +6,7 @@ import MyPage from '@/pages/My/MyPage'
 import LoginPage from '@/pages/Login/LoginPage'
 import WeddingRegisterPage from '@/pages/WeddingRegister/WeddingRegisterPage'
 import AdminPage from '@/pages/Admin/AdminPage'
+import ProfileSettingsPage from '@/pages/ProfileSettings/ProfileSettingsPage'
 
 export default function App() {
   return (
@@ -15,6 +16,7 @@ export default function App() {
       <Route path="/search" element={<SearchPage />} />
       <Route path="/favorites" element={<FavoritesPage />} />
       <Route path="/my" element={<MyPage />} />
+      <Route path="/my/profile" element={<ProfileSettingsPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<WeddingRegisterPage mode="create" />} />
       <Route path="/register/:id" element={<WeddingRegisterPage mode="edit" />} />
