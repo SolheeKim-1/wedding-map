@@ -10,7 +10,7 @@ import { recordView } from '@/services/viewHistoryService'
 import { useAuth } from '@/context/AuthContext'
 import { cn } from '@/utils/cn'
 
-const TABS = ['기본정보', '시설/비용', '위치/교통', '리뷰'] as const
+const TABS = ['기본정보', '시설/비용', '위치/교통'] as const
 
 interface WeddingDetailPanelProps {
   hall: WeddingHall
@@ -256,13 +256,6 @@ export default function WeddingDetailPanel({
                 <p className="text-sm text-subtext">{hall.shuttleInfo}</p>
               </section>
             )}
-          </div>
-        )}
-
-        {tab === '리뷰' && (
-          <div className="flex flex-col items-center justify-center gap-2 py-12 text-center text-subtext">
-            <p>리뷰 기능은 준비 중입니다.</p>
-            <p className="text-xs">추후 사용자 리뷰가 이곳에 표시됩니다.</p>
           </div>
         )}
       </div>
