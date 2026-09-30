@@ -378,7 +378,7 @@ export default function WeddingForm({ initial, submitLabel, onSubmit, onCancel }
                   <span className="shrink-0 text-sm text-subtext">명~</span>
                 </div>
               </Field>
-              <Field label="일요일 저녁 최소 인원">
+              <Field label="토요일 점심 최소 인원">
                 <div className="flex items-center gap-2">
                   <input
                     type="number"

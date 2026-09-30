@@ -34,7 +34,7 @@ export const TEMPLATE_COLUMNS: TemplateColumn[] = [
   { key: 'openUntil', label: '오픈 안내 태그', example: '11월까지오픈' },
   { key: 'tags', label: '태그', example: '한강뷰, 채플식', note: '여러 개는 쉼표(,)로 구분해주세요.' },
   { key: 'minimumGuests', label: '최소 보증 인원', example: '250' },
-  { key: 'sundayEveningGuests', label: '일요일 저녁 최소 인원', example: '200' },
+  { key: 'sundayEveningGuests', label: '토요일 점심 최소 인원', example: '200' },
   { key: 'rentalFee', label: '대관료(원)', example: '9000000' },
   { key: 'mealPrice', label: '식대(원, 1인)', example: '90000' },
   { key: 'negotiable', label: '가격 협의 가능(Y/N)', example: 'N' },
