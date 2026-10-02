@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { X, MapPin, ExternalLink, Pencil, Trash2, Phone, Star, ImageOff } from 'lucide-react'
 import type { WeddingHall } from '@/types/weddingHall'
@@ -6,9 +6,11 @@ import { formatManwon, formatMealPrice, formatGuests, formatParking } from '@/ut
 import { regionLabel } from '@/utils/regions'
 import FavoriteButton from '@/components/Favorite/FavoriteButton'
 import { deleteWeddingHall } from '@/services/weddingHallService'
+import { recordView } from '@/services/viewHistoryService'
+import { useAuth } from '@/context/AuthContext'
 import { cn } from '@/utils/cn'
 
-const TABS = ['기본정보', '시설/비용', '위치/교통', '리뷰'] as const
+const TABS = ['기본정보', '시설/비용', '위치/교통'] as const
 
 interface WeddingDetailPanelProps {
   hall: WeddingHall
@@ -28,12 +30,30 @@ export default function WeddingDetailPanel({
   onShowOnMap,
 }: WeddingDetailPanelProps) {
   const navigate = useNavigate()
+  const { user, isAdmin, authAvailable } = useAuth()
+  const canManage = !authAvailable || isAdmin
   const [tab, setTab] = useState<(typeof TABS)[number]>('기본정보')
   const [imageIndex, setImageIndex] = useState(0)
+  const [lightboxOpen, setLightboxOpen] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [deleteError, setDeleteError] = useState<string | null>(null)
 
   const images = hall.images.length > 0 ? hall.images : hall.mainImage ? [hall.mainImage] : []
+
+  useEffect(() => {
+    void recordView(hall.id, user?.id)
+  }, [hall.id, user?.id])
+
+  useEffect(() => {
+    if (!lightboxOpen) return
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') setLightboxOpen(false)
+      if (e.key === 'ArrowLeft') setImageIndex((i) => (i - 1 + images.length) % images.length)
+      if (e.key === 'ArrowRight') setImageIndex((i) => (i + 1) % images.length)
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [lightboxOpen, images.length])
 
   async function handleDelete() {
     if (!window.confirm(`'${hall.name}'을(를) 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.`)) return
@@ -54,7 +74,12 @@ export default function WeddingDetailPanel({
       <div className="relative">
         <div className="h-56 w-full bg-line md:h-64">
           {images.length > 0 ? (
-            <img src={images[imageIndex]} alt={hall.name} className="h-full w-full object-cover" />
+            <img
+              src={images[imageIndex]}
+              alt={hall.name}
+              onClick={() => setLightboxOpen(true)}
+              className="h-full w-full cursor-zoom-in object-cover"
+            />
           ) : (
             <div className="flex h-full w-full items-center justify-center text-subtext">
               <ImageOff size={36} strokeWidth={1.5} />
@@ -174,7 +199,7 @@ export default function WeddingDetailPanel({
               <h3 className="mb-2 font-semibold text-ink">예식 정보</h3>
               <dl className="grid grid-cols-2 gap-y-3 text-sm">
                 <InfoRow label="최소 보증 인원" value={formatGuests(hall.minimumGuests)} />
-                <InfoRow label="일요일 저녁" value={formatGuests(hall.sundayEveningGuests)} />
+                <InfoRow label="토요일 점심" value={formatGuests(hall.sundayEveningGuests)} />
                 <InfoRow label="대관료" value={formatManwon(hall.rentalFee)} />
                 <InfoRow label="식대" value={formatMealPrice(hall.mealPrice)} />
                 <InfoRow label="예식 형태" value={hall.ceremonyType ?? '정보 없음'} />
@@ -250,13 +275,6 @@ export default function WeddingDetailPanel({
             )}
           </div>
         )}
-
-        {tab === '리뷰' && (
-          <div className="flex flex-col items-center justify-center gap-2 py-12 text-center text-subtext">
-            <p>리뷰 기능은 준비 중입니다.</p>
-            <p className="text-xs">추후 사용자 리뷰가 이곳에 표시됩니다.</p>
-          </div>
-        )}
       </div>
 
       {deleteError && (
@@ -265,30 +283,76 @@ export default function WeddingDetailPanel({
         </div>
       )}
 
-      <div className="sticky bottom-0 flex gap-2 border-t border-line bg-white px-5 py-4">
-        <button
-          type="button"
-          onClick={onShowOnMap}
-          className="flex flex-1 items-center justify-center gap-1.5 rounded-full border border-line py-2.5 text-sm font-medium hover:bg-beige"
+      {canManage && (
+        <div className="sticky bottom-0 flex gap-2 border-t border-line bg-white px-5 py-4">
+          <button
+            type="button"
+            onClick={() => navigate(`/register/${hall.id}`)}
+            className="flex flex-1 items-center justify-center gap-1.5 rounded-full border border-line py-2.5 text-sm font-medium hover:bg-beige"
+          >
+            <Pencil size={15} /> 수정
+          </button>
+          <button
+            type="button"
+            onClick={handleDelete}
+            disabled={deleting}
+            className="flex flex-1 items-center justify-center gap-1.5 rounded-full border border-red-200 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 disabled:opacity-60"
+          >
+            <Trash2 size={15} /> {deleting ? '삭제 중...' : '삭제'}
+          </button>
+        </div>
+      )}
+
+      {lightboxOpen && images.length > 0 && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4"
+          onClick={() => setLightboxOpen(false)}
         >
-          <MapPin size={15} /> 지도에서 보기
-        </button>
-        <button
-          type="button"
-          onClick={() => navigate(`/register/${hall.id}`)}
-          className="flex flex-1 items-center justify-center gap-1.5 rounded-full border border-line py-2.5 text-sm font-medium hover:bg-beige"
-        >
-          <Pencil size={15} /> 수정
-        </button>
-        <button
-          type="button"
-          onClick={handleDelete}
-          disabled={deleting}
-          className="flex flex-1 items-center justify-center gap-1.5 rounded-full border border-red-200 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 disabled:opacity-60"
-        >
-          <Trash2 size={15} /> {deleting ? '삭제 중...' : '삭제'}
-        </button>
-      </div>
+          <button
+            type="button"
+            onClick={() => setLightboxOpen(false)}
+            aria-label="닫기"
+            className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20"
+          >
+            <X size={20} />
+          </button>
+          <img
+            src={images[imageIndex]}
+            alt={hall.name}
+            onClick={(e) => e.stopPropagation()}
+            className="max-h-full max-w-full object-contain"
+          />
+          {images.length > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setImageIndex((i) => (i - 1 + images.length) % images.length)
+                }}
+                aria-label="이전 사진"
+                className="absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-xl text-white hover:bg-white/20 md:left-6"
+              >
+                ‹
+              </button>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setImageIndex((i) => (i + 1) % images.length)
+                }}
+                aria-label="다음 사진"
+                className="absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-xl text-white hover:bg-white/20 md:right-6"
+              >
+                ›
+              </button>
+              <div className="absolute bottom-5 left-1/2 -translate-x-1/2 rounded-full bg-black/50 px-3 py-1 text-xs text-white">
+                {imageIndex + 1} / {images.length}
+              </div>
+            </>
+          )}
+        </div>
+      )}
     </div>
   )
 }
