@@ -23,7 +23,7 @@ export default function Header() {
           />
         </svg>
         <span className="flex items-baseline gap-2">
-          <span className="text-lg font-bold tracking-tight text-ink">WEDDING MAP</span>
+          <span className="text-lg font-bold tracking-tight text-ink">SOLJI</span>
           <span className="hidden text-xs text-subtext md:inline">Find Your Perfect Wedding Hall</span>
         </span>
       </Link>
